@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Mesa Del Toro Cross-Connection Survey</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e1e8ed;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #4facfe;
+            border-bottom-color: #4facfe;
+        }
+
+        .tab:hover {
+            color: #4facfe;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4facfe;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #4facfe;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 5px 15px rgba(81, 207, 102, 0.3);
+        }
+
+        .schedule-management {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .schedule-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .add-date-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .time-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .time-input {
+            flex: 1;
+        }
+
+        .remove-time-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .add-time-btn {
+            background: #51cf66;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .dates-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .date-card {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .date-card:hover {
+            border-color: #4facfe;
+            transform: translateY(-2px);
+        }
+
+        .date-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .date-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .times-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .time-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .remove-time-tag {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .date-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .add-time-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .add-time-row {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 10px;
+        }
+
+        .add-time-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .add-time-btn-small {
+            background: #51cf66;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .add-time-btn-small:hover {
+            background: #40c057;
+        }
+
+        .appointments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .appointment-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4facfe;
+            transition: transform 0.3s ease;
+        }
+
+        .appointment-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .appointment-date {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .appointment-time {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .appointment-details {
+            display: grid;
+            gap: 12px;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-icon {
+            width: 20px;
+            height: 20px;
+            background: #4facfe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            min-width: 80px;
+        }
+
+        .detail-value {
+            color: #333;
+            flex: 1;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .delete-btn:hover {
+            background: #ff3742;
+            transform: translateY(-1px);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-data h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #999;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← Back to Booking</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Admin Panel</h1>
+            <p>Manage appointments and schedule</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('appointments')">Appointments</button>
+                <button class="tab" onclick="switchTab('schedule')">Schedule Management</button>
+            </div>
+
+            <!-- Appointments Tab -->
+            <div id="appointmentsTab" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalAppointments">0</div>
+                        <div class="stat-label">Total Appointments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="todayAppointments">0</div>
+                        <div class="stat-label">Today's Appointments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="thisWeekAppointments">0</div>
+                        <div class="stat-label">This Week</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <input type="text" id="searchBox" class="search-box" placeholder="Search by name, phone, or address...">
+                    <select id="dateFilter" class="filter-select">
+                        <option value="all">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                    <button id="refreshBtn" class="btn">Refresh</button>
+                    <button id="resetDataBtn" class="btn btn-danger">Reset All Data</button>
+                </div>
+
+                <div id="appointmentsContainer">
+                    <div class="loading">Loading appointments...</div>
+                </div>
+            </div>
+
+            <!-- Schedule Management Tab -->
+            <div id="scheduleTab" class="tab-content">
+                <div class="schedule-management">
+                    <h3 class="schedule-title">Availability Counter Settings</h3>
+                    <div class="add-date-section">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="radio" name="counterMode" value="match" checked> Match timeslot amount
+                                </label>
+                                <p style="font-size: 0.9rem; color: #666; margin: 5px 0 0 20px;">Shows actual number of timeslots (e.g., "1/34 taken")</p>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="radio" name="counterMode" value="custom"> Set custom limit
+                                </label>
+                                <div style="margin-left: 20px; margin-top: 10px;">
+                                    <input type="number" id="customLimit" placeholder="Enter limit (e.g., 21)" min="1" style="width: 200px; padding: 8px; border: 1px solid #e1e8ed; border-radius: 6px; margin-right: 10px;">
+                                    <button id="saveCustomLimitBtn" class="btn btn-success">Save</button>
+                                </div>
+                                <p style="font-size: 0.9rem; color: #666; margin: 5px 0 0 20px;">Shows custom limit (e.g., "1/21 taken")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schedule-management">
+                    <h3 class="schedule-title">Import Schedule from JSON</h3>
+                    <div class="add-date-section">
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 2;">
+                                <label for="jsonInput">Paste JSON data here:</label>
+                                <textarea id="jsonInput" rows="8" placeholder='Paste your JSON data here...' style="width: 100%; padding: 10px; border: 2px solid #e1e8ed; border-radius: 8px; font-family: monospace; font-size: 0.9rem;"></textarea>
+                            </div>
+                        </div>
+                        <button id="importJsonBtn" class="btn btn-success">Import JSON</button>
+                    </div>
+                </div>
+
+                <div class="schedule-management">
+                    <h3 class="schedule-title">Add New Date</h3>
+                    <div class="add-date-section">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newDate">Date</label>
+                                <input type="date" id="newDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="startTime">Start Time</label>
+                                <input type="time" id="startTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="endTime">End Time</label>
+                                <input type="time" id="endTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="interval">Interval (minutes)</label>
+                                <select id="interval">
+                                    <option value="60" selected>60 minutes</option>
+                                    <option value="30">30 minutes</option>
+                                    <option value="15">15 minutes</option>
+                                </select>
+                            </div>
+                            <button id="addTimeRangeBtn" class="btn btn-success">Add Time Range</button>
+                        </div>
+                        <div id="timesList"></div>
+                        <button id="saveDateBtn" class="btn">Save Date</button>
+                    </div>
+                </div>
+
+                <div class="schedule-management">
+                    <h3 class="schedule-title">Manage Existing Dates</h3>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <button id="resetScheduleBtn" class="btn btn-danger">Reset Schedule Data</button>
+                    </div>
+                    <div id="datesList" class="dates-list">
+                        <div class="loading">Loading schedule...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFLqSGZUKYTYed7n6RNqRt0vIAnzwTpyI",
+            authDomain: "crosscontrolsurvey.firebaseapp.com",
+            projectId: "crosscontrolsurvey",
+            storageBucket: "crosscontrolsurvey.firebasestorage.app",
+            messagingSenderId: "154300499590",
+            appId: "1:154300499590:web:7d0610824770701503b307",
+            measurementId: "G-95Y43EXCPJ"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Global variables
+        let allAppointments = [];
+        let filteredAppointments = [];
+        let scheduleData = {};
+        let currentTimes = [];
+        let counterSettings = {
+            mode: 'match', // 'match' or 'custom'
+            customLimit: null
+        };
+
+        // Parse 'YYYY-MM-DD' as a *local* date (no timezone shift)
+        function parseLocalDate(ymd) {
+            const [y, m, d] = ymd.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        }
+
+        // Create 'YYYY-MM-DD' from a Date using *local* components
+        function localISODate(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            
+            // Load data for the selected tab
+            if (tabName === 'schedule') {
+                loadScheduleData();
+            }
+        }
+
+        // Load appointments from Firebase
+        async function loadAppointments() {
+            try {
+                const snapshot = await db.collection('appointments')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                allAppointments = [];
+                snapshot.forEach(doc => {
+                    allAppointments.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                filteredAppointments = [...allAppointments];
+                updateStats();
+                renderAppointments();
+            } catch (error) {
+                console.error('Error loading appointments:', error);
+                document.getElementById('appointmentsContainer').innerHTML = 
+                    '<div class="no-data"><h3>Error loading appointments</h3><p>Please try again later.</p></div>';
+            }
+        }
+
+        // Load counter settings from Firebase
+        async function loadCounterSettings() {
+            try {
+                const doc = await db.collection('settings').doc('counter').get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    counterSettings = {
+                        mode: data.mode || 'match',
+                        customLimit: data.customLimit || null
+                    };
+                }
+                updateCounterSettingsUI();
+            } catch (error) {
+                console.error('Error loading counter settings:', error);
+            }
+        }
+
+        // Save counter settings to Firebase
+        async function saveCounterSettings() {
+            try {
+                await db.collection('settings').doc('counter').set(counterSettings);
+                alert('Counter settings saved successfully!');
+            } catch (error) {
+                console.error('Error saving counter settings:', error);
+                alert('Error saving counter settings. Please try again.');
+            }
+        }
+
+        // Update counter settings UI
+        function updateCounterSettingsUI() {
+            const matchRadio = document.querySelector('input[name="counterMode"][value="match"]');
+            const customRadio = document.querySelector('input[name="counterMode"][value="custom"]');
+            const customLimitInput = document.getElementById('customLimit');
+            
+            if (counterSettings.mode === 'custom') {
+                customRadio.checked = true;
+                customLimitInput.value = counterSettings.customLimit || '';
+            } else {
+                matchRadio.checked = true;
+                customLimitInput.value = '';
+            }
+        }
+
+        // Load schedule data from Firebase
+        async function loadScheduleData() {
+            try {
+                const snapshot = await db.collection('schedule').get();
+                scheduleData = {};
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    scheduleData[data.date] = data.times || [];
+                });
+                
+                renderSchedule();
+            } catch (error) {
+                console.error('Error loading schedule data:', error);
+                document.getElementById('datesList').innerHTML = 
+                    '<div class="no-data"><h3>Error loading schedule</h3><p>Please try again later.</p></div>';
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = allAppointments.length;
+            document.getElementById('totalAppointments').textContent = total;
+
+            const today = localISODate(new Date());
+            const todayCount = allAppointments.filter(apt => apt.date === today).length;
+            document.getElementById('todayAppointments').textContent = todayCount;
+
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            const weekStartStr = localISODate(weekStart);
+            const weekCount = allAppointments.filter(apt => apt.date >= weekStartStr).length;
+            document.getElementById('thisWeekAppointments').textContent = weekCount;
+        }
+
+        // Render appointments
+        function renderAppointments() {
+            const container = document.getElementById('appointmentsContainer');
+            
+            if (filteredAppointments.length === 0) {
+                container.innerHTML = '<div class="no-data"><h3>No appointments found</h3><p>No appointments match your current filters.</p></div>';
+                return;
+            }
+
+            const appointmentsHTML = filteredAppointments.map(appointment => {
+                const appointmentDate = parseLocalDate(appointment.date);
+                const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                return `
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="appointment-date">${formattedDate}</div>
+                            <div class="appointment-time">${appointment.time}</div>
+                        </div>
+                        <div class="appointment-details">
+                            <div class="detail-row">
+                                <div class="detail-icon">👤</div>
+                                <div class="detail-label">Name:</div>
+                                <div class="detail-value">${appointment.name}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-icon">📍</div>
+                                <div class="detail-label">Address:</div>
+                                <div class="detail-value">${appointment.address}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-icon">📞</div>
+                                <div class="detail-label">Phone:</div>
+                                <div class="detail-value">${appointment.phone}</div>
+                            </div>
+                            <button class="delete-btn" onclick="deleteAppointment('${appointment.id}')">Delete Appointment</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `<div class="appointments-grid">${appointmentsHTML}</div>`;
+        }
+
+        // Render schedule
+        function renderSchedule() {
+            const container = document.getElementById('datesList');
+            
+            if (Object.keys(scheduleData).length === 0) {
+                container.innerHTML = '<div class="no-data"><h3>No dates scheduled</h3><p>Add some dates to get started.</p></div>';
+                return;
+            }
+
+            const datesHTML = Object.entries(scheduleData)
+                .sort(([a], [b]) => parseLocalDate(a) - parseLocalDate(b))
+                .map(([date, times]) => {
+                    const dateObj = parseLocalDate(date);
+                    const formattedDate = dateObj.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+
+                    return `
+                        <div class="date-card">
+                            <div class="date-header">
+                                <div class="date-title">${formattedDate}</div>
+                                <button class="btn btn-danger" onclick="deleteDate('${date}')">Delete Date</button>
+                            </div>
+                            <div class="times-list">
+                                ${times.map(time => `
+                                    <div class="time-tag">
+                                        ${time}
+                                        <button class="remove-time-tag" onclick="removeTimeFromDate('${date}', '${time}')">×</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="add-time-section">
+                                <div class="add-time-row">
+                                    <input type="time" class="add-time-input" id="newTime_${date}" placeholder="Select time">
+                                    <button class="add-time-btn-small" onclick="addTimeToDate('${date}')">Add Time</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            container.innerHTML = datesHTML;
+        }
+
+        // Add time range to current date
+        function addTimeRange() {
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const interval = parseInt(document.getElementById('interval').value);
+            
+            if (!startTime || !endTime) {
+                alert('Please select both start and end times.');
+                return;
+            }
+            
+            if (startTime >= endTime) {
+                alert('End time must be after start time.');
+                return;
+            }
+            
+            // Generate time slots from range
+            const timeSlots = generateTimeSlots(startTime, endTime, interval);
+            
+            // Add new slots to current times (avoid duplicates)
+            timeSlots.forEach(slot => {
+                if (!currentTimes.includes(slot)) {
+                    currentTimes.push(slot);
+                }
+            });
+            
+            // Sort times
+            currentTimes.sort();
+            
+            renderCurrentTimes();
+            
+            // Clear inputs
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+        }
+
+        // Generate time slots from start time, end time, and interval
+        function generateTimeSlots(startTime, endTime, intervalMinutes) {
+            const slots = [];
+            const start = new Date(`2000-01-01T${startTime}`);
+            const end = new Date(`2000-01-01T${endTime}`);
+            
+            let current = new Date(start);
+            
+            while (current < end) {
+                const timeString = current.toTimeString().slice(0, 5);
+                slots.push(timeString);
+                current.setMinutes(current.getMinutes() + intervalMinutes);
+            }
+            
+            return slots;
+        }
+
+        // Remove time from current date
+        function removeTime(index) {
+            currentTimes.splice(index, 1);
+            renderCurrentTimes();
+        }
+
+        // Render current times
+        function renderCurrentTimes() {
+            const container = document.getElementById('timesList');
+            container.innerHTML = currentTimes.map((time, index) => `
+                <div class="time-tag">
+                    ${time}
+                    <button class="remove-time-tag" onclick="removeTime(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // Import JSON data
+        async function importJson() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            
+            if (!jsonInput) {
+                alert('Please paste JSON data first.');
+                return;
+            }
+            
+            if (!confirm('This will REPLACE all existing schedule data. Are you sure you want to continue?')) {
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(jsonInput);
+                
+                if (!Array.isArray(data)) {
+                    alert('JSON must be an array of date objects.');
+                    return;
+                }
+                
+                // First, delete all existing schedule data
+                const batch = db.batch();
+                const existingSnapshot = await db.collection('schedule').get();
+                
+                existingSnapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                
+                await batch.commit();
+                
+                // Clear local data
+                scheduleData = {};
+                
+                let importedCount = 0;
+                let errorCount = 0;
+                
+                // Then add new data
+                for (const item of data) {
+                    if (!item.date || !item.times || !Array.isArray(item.times)) {
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    try {
+                        await db.collection('schedule').doc(item.date).set({
+                            date: item.date,
+                            times: item.times
+                        });
+                        
+                        // Update local data
+                        scheduleData[item.date] = item.times;
+                        importedCount++;
+                    } catch (error) {
+                        console.error('Error importing date:', item.date, error);
+                        errorCount++;
+                    }
+                }
+                
+                // Refresh schedule display
+                renderSchedule();
+                
+                // Clear the textarea
+                document.getElementById('jsonInput').value = '';
+                
+                alert(`Import completed! All old data cleared and ${importedCount} new dates imported successfully. ${errorCount} errors occurred.`);
+                
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                alert('Invalid JSON format. Please check your data and try again.');
+            }
+        }
+
+        // Save new date
+        async function saveDate() {
+            const dateInput = document.getElementById('newDate');
+            const date = dateInput.value;
+            
+            if (!date || currentTimes.length === 0) {
+                alert('Please select a date and add at least one time slot.');
+                return;
+            }
+            
+            try {
+                await db.collection('schedule').doc(date).set({
+                    date: date,
+                    times: currentTimes
+                });
+                
+                // Update local data
+                scheduleData[date] = currentTimes;
+                
+                // Reset form
+                dateInput.value = '';
+                currentTimes = [];
+                renderCurrentTimes();
+                
+                // Refresh schedule display
+                renderSchedule();
+                
+                alert('Date saved successfully!');
+            } catch (error) {
+                console.error('Error saving date:', error);
+                alert('Error saving date. Please try again.');
+            }
+        }
+
+        // Delete date
+        async function deleteDate(date) {
+            if (confirm('Are you sure you want to delete this date and all its time slots?')) {
+                try {
+                    await db.collection('schedule').doc(date).delete();
+                    delete scheduleData[date];
+                    renderSchedule();
+                    alert('Date deleted successfully!');
+                } catch (error) {
+                    console.error('Error deleting date:', error);
+                    alert('Error deleting date. Please try again.');
+                }
+            }
+        }
+
+        // Add time to existing date
+        async function addTimeToDate(date) {
+            const timeInput = document.getElementById(`newTime_${date}`);
+            const newTime = timeInput.value;
+            
+            if (!newTime) {
+                alert('Please select a time.');
+                return;
+            }
+            
+            if (scheduleData[date].includes(newTime)) {
+                alert('This time slot already exists for this date.');
+                return;
+            }
+            
+            try {
+                const updatedTimes = [...scheduleData[date], newTime].sort();
+                
+                await db.collection('schedule').doc(date).set({
+                    date: date,
+                    times: updatedTimes
+                });
+                
+                scheduleData[date] = updatedTimes;
+                renderSchedule();
+                
+                // Clear the input
+                timeInput.value = '';
+                
+                alert('Time slot added successfully!');
+            } catch (error) {
+                console.error('Error adding time:', error);
+                alert('Error adding time. Please try again.');
+            }
+        }
+
+        // Remove time from date
+        async function removeTimeFromDate(date, time) {
+            if (confirm('Are you sure you want to remove this time slot?')) {
+                try {
+                    const updatedTimes = scheduleData[date].filter(t => t !== time);
+                    
+                    if (updatedTimes.length === 0) {
+                        // If no times left, delete the entire date
+                        await db.collection('schedule').doc(date).delete();
+                        delete scheduleData[date];
+                    } else {
+                        // Update with remaining times
+                        await db.collection('schedule').doc(date).set({
+                            date: date,
+                            times: updatedTimes
+                        });
+                        scheduleData[date] = updatedTimes;
+                    }
+                    
+                    renderSchedule();
+                    alert('Time slot removed successfully!');
+                } catch (error) {
+                    console.error('Error removing time:', error);
+                    alert('Error removing time. Please try again.');
+                }
+            }
+        }
+
+        // Delete individual appointment
+        async function deleteAppointment(appointmentId) {
+            if (confirm('Are you sure you want to delete this appointment?')) {
+                try {
+                    await db.collection('appointments').doc(appointmentId).delete();
+                    allAppointments = allAppointments.filter(apt => apt.id !== appointmentId);
+                    filteredAppointments = filteredAppointments.filter(apt => apt.id !== appointmentId);
+                    
+                    updateStats();
+                    renderAppointments();
+                } catch (error) {
+                    console.error('Error deleting appointment:', error);
+                    alert('Error deleting appointment. Please try again.');
+                }
+            }
+        }
+
+        // Reset schedule data
+        async function resetScheduleData() {
+            if (confirm('Are you sure you want to delete ALL schedule data (dates and times)? This action cannot be undone!')) {
+                try {
+                    const batch = db.batch();
+                    const snapshot = await db.collection('schedule').get();
+                    
+                    snapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    await batch.commit();
+                    
+                    scheduleData = {};
+                    renderSchedule();
+                    
+                    alert('All schedule data has been deleted successfully!');
+                } catch (error) {
+                    console.error('Error resetting schedule data:', error);
+                    alert('Error resetting schedule data. Please try again.');
+                }
+            }
+        }
+
+        // Reset all data
+        async function resetAllData() {
+            if (confirm('Are you sure you want to delete ALL appointments? This action cannot be undone!')) {
+                try {
+                    const batch = db.batch();
+                    const snapshot = await db.collection('appointments').get();
+                    
+                    snapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    await batch.commit();
+                    
+                    allAppointments = [];
+                    filteredAppointments = [];
+                    updateStats();
+                    renderAppointments();
+                    
+                    alert('All appointments have been deleted successfully!');
+                } catch (error) {
+                    console.error('Error resetting data:', error);
+                    alert('Error resetting data. Please try again.');
+                }
+            }
+        }
+
+        // Filter appointments
+        function filterAppointments() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            filteredAppointments = allAppointments.filter(appointment => {
+                const matchesSearch = !searchTerm || 
+                    appointment.name.toLowerCase().includes(searchTerm) ||
+                    appointment.address.toLowerCase().includes(searchTerm) ||
+                    appointment.phone.includes(searchTerm);
+                
+                let matchesDate = true;
+                if (dateFilter !== 'all') {
+                    const appointmentDate = parseLocalDate(appointment.date);
+                    const today = new Date();
+                    
+                    switch (dateFilter) {
+                        case 'today':
+                            matchesDate = appointment.date === localISODate(today);
+                            break;
+                        case 'week':
+                            const weekStart = new Date(today);
+                            weekStart.setDate(today.getDate() - today.getDay());
+                            matchesDate = appointmentDate >= weekStart;
+                            break;
+                        case 'month':
+                            matchesDate = appointmentDate.getMonth() === today.getMonth() && 
+                                         appointmentDate.getFullYear() === today.getFullYear();
+                            break;
+                    }
+                }
+                
+                return matchesSearch && matchesDate;
+            });
+            
+            renderAppointments();
+        }
+
+        // Handle counter mode change
+        function handleCounterModeChange() {
+            const customLimitInput = document.getElementById('customLimit');
+            const customRadio = document.querySelector('input[name="counterMode"][value="custom"]');
+            
+            if (customRadio.checked) {
+                customLimitInput.disabled = false;
+                customLimitInput.focus();
+            } else {
+                customLimitInput.disabled = true;
+                customLimitInput.value = '';
+            }
+        }
+
+        // Save custom limit
+        function saveCustomLimit() {
+            const customLimitInput = document.getElementById('customLimit');
+            const limit = parseInt(customLimitInput.value);
+            
+            if (!limit || limit < 1) {
+                alert('Please enter a valid limit (1 or greater).');
+                return;
+            }
+            
+            counterSettings.mode = 'custom';
+            counterSettings.customLimit = limit;
+            saveCounterSettings();
+        }
+
+        // Event listeners
+        document.getElementById('searchBox').addEventListener('input', filterAppointments);
+        document.getElementById('dateFilter').addEventListener('change', filterAppointments);
+        document.getElementById('refreshBtn').addEventListener('click', loadAppointments);
+        document.getElementById('resetDataBtn').addEventListener('click', resetAllData);
+        document.getElementById('addTimeRangeBtn').addEventListener('click', addTimeRange);
+        document.getElementById('saveDateBtn').addEventListener('click', saveDate);
+        document.getElementById('importJsonBtn').addEventListener('click', importJson);
+        document.getElementById('resetScheduleBtn').addEventListener('click', resetScheduleData);
+        document.getElementById('saveCustomLimitBtn').addEventListener('click', saveCustomLimit);
+        
+        // Counter mode radio buttons
+        document.querySelectorAll('input[name="counterMode"]').forEach(radio => {
+            radio.addEventListener('change', handleCounterModeChange);
+        });
+
+        // Initialize app
+        loadAppointments();
+        loadCounterSettings();
+    </script>
+</body>
+</html>
