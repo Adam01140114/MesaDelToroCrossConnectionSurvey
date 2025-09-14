@@ -420,7 +420,8 @@
             font-weight: 500;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 15px;
             border: 2px solid #e1e8ed;
@@ -429,9 +430,15 @@
             transition: border-color 0.3s ease;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #4facfe;
+        }
+
+        .form-group select {
+            background: white;
+            cursor: pointer;
         }
 
         .btn {
@@ -500,6 +507,8 @@
                 padding: 20px;
             }
         }
+
+
     </style>
 </head>
 <body>
@@ -515,7 +524,7 @@
             <div class="info-section">
                 <div class="info-card">
                    
-                    <p>Please pick a date and time that works for you and enter the requested information to reserve your slot.</p>
+                    <p>Please pick a date and time that works for you, <b> select your address </b>, and enter the requested information to reserve your slot.</p>
                     <p>If none of these dates and times work for you or you have a date/time slot that works but is taken, please email us at <a href="mailto:californiascada@gmail.com">californiascada@gmail.com</a> and we will reach out to you to find a better date and time.</p>
                 </div>
             </div>
@@ -540,7 +549,9 @@
                     </div>
                     <div class="form-group">
                         <label for="userAddress">Address *</label>
-                        <input type="text" id="userAddress" required>
+                        <select id="userAddress" required>
+                            <option value="">Select your address...</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="userPhone">Phone Number *</label>
@@ -555,8 +566,8 @@
             <div id="successMessage" class="success-message">
                 <h3>Appointment Reserved Successfully!</h3>
                 <p>Your appointment has been confirmed. We'll see you soon!</p>
-                <button id="exitBtn" class="btn" style="margin-top: 20px; width: auto; display: inline-block;">Exit</button>
             </div>
+
 
             <!-- Regulatory Information Footer -->
             <div class="regulatory-footer">
@@ -620,6 +631,8 @@
         let availableDates = [];
         let reservedSlots = new Set();
         let scheduleData = {};
+        let locations = [];
+        let usedAddresses = new Set(); // Track addresses that have been used
         let appointmentData = new Map(); // Store appointment details for reserved slots
         let counterSettings = {
             mode: 'match', // 'match' or 'custom'
@@ -628,6 +641,10 @@
 
         // Parse 'YYYY-MM-DD' as a *local* date (no timezone shift)
         function parseLocalDate(ymd) {
+            if (typeof ymd !== 'string') {
+                console.error('parseLocalDate expects a string, got:', typeof ymd, ymd);
+                return new Date();
+            }
             const [y, m, d] = ymd.split('-').map(Number);
             return new Date(y, m - 1, d);
         }
@@ -656,6 +673,39 @@
             }
         }
 
+        // Load locations from Firebase
+        async function loadLocations() {
+            try {
+                const snapshot = await db.collection('locations').get();
+                locations = [];
+                snapshot.forEach(doc => {
+                    locations.push(doc.data().name);
+                });
+                locations.sort();
+                populateLocationDropdown();
+            } catch (error) {
+                console.error('Error loading locations:', error);
+            }
+        }
+
+        // Populate the location dropdown
+        function populateLocationDropdown() {
+            const select = document.getElementById('userAddress');
+            select.innerHTML = '<option value="">Select your address...</option>';
+            
+            // Filter out used addresses
+            const availableLocations = locations.filter(location => !usedAddresses.has(location));
+            
+            availableLocations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                option.textContent = location;
+                select.appendChild(option);
+            });
+        }
+
+
+
         // Load schedule data from Firebase
         async function loadScheduleData() {
             try {
@@ -679,17 +729,25 @@
                 const snapshot = await db.collection('appointments').get();
                 reservedSlots.clear();
                 appointmentData.clear();
+                usedAddresses.clear();
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const slotKey = `${data.date}_${data.time}`;
                     reservedSlots.add(slotKey);
+                    
+                    // Track used addresses
+                    usedAddresses.add(data.address);
+                    
                     appointmentData.set(slotKey, {
                         name: data.name,
                         address: data.address,
                         phone: data.phone
                     });
                 });
+                
+                updateAvailabilityCounter();
+                populateLocationDropdown(); // Refresh dropdown with updated addresses
             } catch (error) {
                 console.error('Error loading reserved slots:', error);
             }
@@ -861,7 +919,7 @@
             
             try {
                 // Save appointment to Firebase
-                await db.collection('appointments').add({
+                const docRef = await db.collection('appointments').add({
                     date: selectedDate,
                     time: selectedTime,
                     name: userName,
@@ -878,18 +936,13 @@
                     address: userAddress,
                     phone: userPhone
                 });
+
+                // Add address to used addresses
+                usedAddresses.add(userAddress);
                 
                 // Hide booking form and show success message
                 document.getElementById('bookingForm').classList.remove('active');
                 document.getElementById('successMessage').style.display = 'block';
-                
-                // Add exit button event listener
-                const exitBtn = document.getElementById('exitBtn');
-                if (exitBtn) {
-                    exitBtn.addEventListener('click', () => {
-                        location.reload();
-                    });
-                }
                 
                 // Reset form
                 document.getElementById('userName').value = '';
@@ -919,11 +972,21 @@
         // Initialize app
         async function init() {
             await loadCounterSettings();
+            await loadLocations();
             await loadScheduleData();
             availableDates = generateAvailableDates();
             await loadReservedSlots();
             renderSchedule();
         }
+
+        // Keyboard shortcut to open admin page
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey) {
+                e.preventDefault();
+                window.location.href = 'admin.html';
+            }
+        });
+
 
         // Start the app
         init();

@@ -464,6 +464,23 @@
             transform: translateY(-1px);
         }
 
+        .edit-btn {
+            background: #4facfe;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .edit-btn:hover {
+            background: #3d8bfe;
+            transform: translateY(-1px);
+        }
+
         .no-data {
             text-align: center;
             padding: 60px 20px;
@@ -501,6 +518,372 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .password-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-content h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .password-content p {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .password-content input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .password-content input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .password-error {
+            color: #ff4757;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logout-btn:hover {
+            background: #ff3742;
+            transform: translateY(-1px);
+        }
+
+        .edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .edit-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .edit-content h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .locations-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .location-item {
+            background: #f8f9fa;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .location-item:hover {
+            background: #e9ecef;
+            border-color: #4facfe;
+        }
+
+        .location-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .location-delete {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .location-delete:hover {
+            background: #ff3742;
+        }
+
+        /* Location Management Styling */
+        .location-management-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .location-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .location-header h3 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .location-header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .location-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border: 1px solid #e1e8ed;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px 25px;
+            border-bottom: none;
+        }
+
+        .card-header h4 {
+            margin: 0 0 8px 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .card-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .import-card .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .add-card .card-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .locations-card .card-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .location-card textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s ease;
+        }
+
+        .location-card textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .add-location-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .add-location-form input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .add-location-form input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .import-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            white-space: nowrap;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .locations-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .location-item {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .location-item:hover {
+            background: #f8f9fa;
+            border-color: #4facfe;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .location-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .location-delete {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .location-delete:hover {
+            background: #ff3742;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .location-management-container {
+                padding: 15px;
+            }
+            
+            .location-header {
+                padding: 20px;
+                margin-bottom: 30px;
+            }
+            
+            .location-header h3 {
+                font-size: 1.5rem;
+            }
+            
+            .add-location-form {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .add-btn {
+                width: 100%;
+            }
+            
+            .locations-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -527,16 +910,54 @@
 <body>
     <a href="index.html" class="back-link">← Back to Booking</a>
     
-    <div class="container">
+    <!-- Password Protection Modal -->
+    <div id="passwordModal" class="password-modal">
+        <div class="password-content">
+            <h2>Admin Access Required</h2>
+            <p>Please enter the admin password to continue:</p>
+            <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="off">
+            <button id="passwordSubmit" class="btn">Access Admin Panel</button>
+            <div id="passwordError" class="password-error" style="display: none;">Incorrect password. Please try again.</div>
+        </div>
+    </div>
+
+    <!-- Edit Appointment Modal -->
+    <div id="editModal" class="edit-modal" style="display: none;">
+        <div class="edit-content">
+            <h3>Edit Appointment</h3>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editName">Full Name *</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editAddress">Address *</label>
+                    <input type="text" id="editAddress" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPhone">Phone Number *</label>
+                    <input type="tel" id="editPhone" required>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn">Save Changes</button>
+                    <button type="button" id="cancelEdit" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container" id="adminContainer" style="display: none;">
         <div class="header">
             <h1>Admin Panel</h1>
             <p>Manage appointments and schedule</p>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
         </div>
         
         <div class="main-content">
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('appointments')">Appointments</button>
                 <button class="tab" onclick="switchTab('schedule')">Schedule Management</button>
+                <button class="tab" onclick="switchTab('locations')">Location Management</button>
             </div>
 
             <!-- Appointments Tab -->
@@ -655,6 +1076,56 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Location Management Tab -->
+            <div id="locationsTab" class="tab-content">
+                <div class="location-management-container">
+                    <div class="location-header">
+                        <h3>📍 Location Management</h3>
+                        <p>Manage valid address options for appointment bookings</p>
+                    </div>
+                    
+                    <!-- Import Locations from JSON -->
+                    <div class="location-card import-card">
+                        <div class="card-header">
+                            <h4>📥 Import Locations from JSON</h4>
+                            <p>Bulk import locations from a JSON array</p>
+                        </div>
+                        <div class="card-content">
+                            <textarea id="locationJsonInput" placeholder='Paste JSON array of locations, e.g., ["398 CDT", "396 CDT", "27145 Vista DT"]' rows="4"></textarea>
+                            <button id="importLocationJsonBtn" class="btn import-btn">Import Locations</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Add New Location -->
+                    <div class="location-card add-card">
+                        <div class="card-header">
+                            <h4>➕ Add New Location</h4>
+                            <p>Add a single location to the system</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="add-location-form">
+                                <input type="text" id="newLocationInput" placeholder="Enter location name">
+                                <button id="addLocationBtn" class="btn add-btn">Add Location</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Current Locations -->
+                    <div class="location-card locations-card">
+                        <div class="card-header">
+                            <h4>📋 Current Locations</h4>
+                            <p>Manage existing locations in the system</p>
+                        </div>
+                        <div class="card-content">
+                            <div id="locationsList" class="locations-list">
+                                <!-- Locations will be populated here -->
+                            </div>
+                            <button id="resetLocationsBtn" class="btn btn-danger reset-btn">Reset All Locations</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -683,6 +1154,8 @@
             mode: 'match', // 'match' or 'custom'
             customLimit: null
         };
+        let currentEditingId = null;
+        let locations = [];
 
         // Parse 'YYYY-MM-DD' as a *local* date (no timezone shift)
         function parseLocalDate(ymd) {
@@ -711,6 +1184,8 @@
             // Load data for the selected tab
             if (tabName === 'schedule') {
                 loadScheduleData();
+            } else if (tabName === 'locations') {
+                loadLocations();
             }
         }
 
@@ -857,7 +1332,10 @@
                                 <div class="detail-label">Phone:</div>
                                 <div class="detail-value">${appointment.phone}</div>
                             </div>
-                            <button class="delete-btn" onclick="deleteAppointment('${appointment.id}')">Delete Appointment</button>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                                <button class="edit-btn" onclick="editAppointment('${appointment.id}')">Edit Appointment</button>
+                                <button class="delete-btn" onclick="deleteAppointment('${appointment.id}')">Delete Appointment</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1303,6 +1781,247 @@
             saveCounterSettings();
         }
 
+        // Password protection functions
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === 'bogo') {
+                document.getElementById('passwordModal').style.display = 'none';
+                document.getElementById('adminContainer').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordError').style.display = 'none';
+            } else {
+                document.getElementById('passwordError').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function logout() {
+            document.getElementById('passwordModal').style.display = 'flex';
+            document.getElementById('adminContainer').style.display = 'none';
+        }
+
+        // Edit appointment functions
+        function editAppointment(appointmentId) {
+            const appointment = allAppointments.find(apt => apt.id === appointmentId);
+            if (!appointment) return;
+
+            currentEditingId = appointmentId;
+            document.getElementById('editName').value = appointment.name;
+            document.getElementById('editAddress').value = appointment.address;
+            document.getElementById('editPhone').value = appointment.phone;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        async function saveAppointmentEdit() {
+            if (!currentEditingId) return;
+
+            const name = document.getElementById('editName').value;
+            const address = document.getElementById('editAddress').value;
+            const phone = document.getElementById('editPhone').value;
+
+            if (!name || !address || !phone) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            try {
+                await db.collection('appointments').doc(currentEditingId).update({
+                    name: name,
+                    address: address,
+                    phone: phone
+                });
+
+                // Update local data
+                const appointment = allAppointments.find(apt => apt.id === currentEditingId);
+                if (appointment) {
+                    appointment.name = name;
+                    appointment.address = address;
+                    appointment.phone = phone;
+                }
+
+                // Update filtered appointments
+                const filteredAppointment = filteredAppointments.find(apt => apt.id === currentEditingId);
+                if (filteredAppointment) {
+                    filteredAppointment.name = name;
+                    filteredAppointment.address = address;
+                    filteredAppointment.phone = phone;
+                }
+
+                renderAppointments();
+                document.getElementById('editModal').style.display = 'none';
+                currentEditingId = null;
+
+                alert('Appointment updated successfully!');
+            } catch (error) {
+                console.error('Error updating appointment:', error);
+                alert('Error updating appointment. Please try again.');
+            }
+        }
+
+        function cancelEdit() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditingId = null;
+        }
+
+        // Location management functions
+        async function loadLocations() {
+            try {
+                const snapshot = await db.collection('locations').get();
+                locations = [];
+                snapshot.forEach(doc => {
+                    locations.push(doc.data().name);
+                });
+                locations.sort();
+                renderLocations();
+            } catch (error) {
+                console.error('Error loading locations:', error);
+            }
+        }
+
+        function renderLocations() {
+            const locationsList = document.getElementById('locationsList');
+            if (locations.length === 0) {
+                locationsList.innerHTML = '<div class="no-data">No locations added yet.</div>';
+                return;
+            }
+
+            locationsList.innerHTML = locations.map(location => `
+                <div class="location-item">
+                    <span class="location-name">${location}</span>
+                    <button class="location-delete" onclick="deleteLocation('${location}')">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        async function addLocation() {
+            const input = document.getElementById('newLocationInput');
+            const locationName = input.value.trim();
+            
+            if (!locationName) {
+                alert('Please enter a location name.');
+                return;
+            }
+
+            if (locations.includes(locationName)) {
+                alert('This location already exists.');
+                return;
+            }
+
+            try {
+                await db.collection('locations').add({
+                    name: locationName,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                locations.push(locationName);
+                locations.sort();
+                renderLocations();
+                input.value = '';
+            } catch (error) {
+                console.error('Error adding location:', error);
+                alert('Error adding location. Please try again.');
+            }
+        }
+
+        async function deleteLocation(locationName) {
+            if (!confirm(`Are you sure you want to delete "${locationName}"?`)) {
+                return;
+            }
+
+            try {
+                const snapshot = await db.collection('locations')
+                    .where('name', '==', locationName)
+                    .get();
+                
+                const batch = db.batch();
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+
+                locations = locations.filter(loc => loc !== locationName);
+                renderLocations();
+            } catch (error) {
+                console.error('Error deleting location:', error);
+                alert('Error deleting location. Please try again.');
+            }
+        }
+
+        async function importLocationJson() {
+            const jsonInput = document.getElementById('locationJsonInput').value.trim();
+            
+            if (!jsonInput) {
+                alert('Please enter JSON data.');
+                return;
+            }
+
+            try {
+                const newLocations = JSON.parse(jsonInput);
+                
+                if (!Array.isArray(newLocations)) {
+                    alert('JSON must be an array of location names.');
+                    return;
+                }
+
+                if (!confirm(`This will replace all existing locations with ${newLocations.length} new locations. Continue?`)) {
+                    return;
+                }
+
+                // Delete all existing locations
+                const snapshot = await db.collection('locations').get();
+                const batch = db.batch();
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+
+                // Add new locations
+                const newBatch = db.batch();
+                newLocations.forEach(location => {
+                    if (location && typeof location === 'string') {
+                        const docRef = db.collection('locations').doc();
+                        newBatch.set(docRef, {
+                            name: location.trim(),
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                });
+                await newBatch.commit();
+
+                locations = newLocations.map(loc => loc.trim()).filter(loc => loc);
+                locations.sort();
+                renderLocations();
+                document.getElementById('locationJsonInput').value = '';
+                
+                alert(`Successfully imported ${locations.length} locations!`);
+            } catch (error) {
+                console.error('Error importing locations:', error);
+                alert('Invalid JSON format. Please check your input.');
+            }
+        }
+
+        async function resetAllLocations() {
+            if (!confirm('Are you sure you want to delete ALL locations? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const snapshot = await db.collection('locations').get();
+                const batch = db.batch();
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+
+                locations = [];
+                renderLocations();
+                alert('All locations have been deleted.');
+            } catch (error) {
+                console.error('Error resetting locations:', error);
+                alert('Error resetting locations. Please try again.');
+            }
+        }
+
         // Event listeners
         document.getElementById('searchBox').addEventListener('input', filterAppointments);
         document.getElementById('dateFilter').addEventListener('change', filterAppointments);
@@ -1314,10 +2033,32 @@
         document.getElementById('resetScheduleBtn').addEventListener('click', resetScheduleData);
         document.getElementById('saveCustomLimitBtn').addEventListener('click', saveCustomLimit);
         
+        // Password protection
+        document.getElementById('passwordSubmit').addEventListener('click', checkPassword);
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        
+        // Edit appointment
+        document.getElementById('editForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveAppointmentEdit();
+        });
+        document.getElementById('cancelEdit').addEventListener('click', cancelEdit);
+        
         // Counter mode radio buttons
         document.querySelectorAll('input[name="counterMode"]').forEach(radio => {
             radio.addEventListener('change', handleCounterModeChange);
         });
+
+        // Location management
+        document.getElementById('addLocationBtn').addEventListener('click', addLocation);
+        document.getElementById('newLocationInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addLocation();
+        });
+        document.getElementById('importLocationJsonBtn').addEventListener('click', importLocationJson);
+        document.getElementById('resetLocationsBtn').addEventListener('click', resetAllLocations);
 
         // Initialize app
         loadAppointments();
