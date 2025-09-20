@@ -886,7 +886,7 @@
             slot.classList.add('selected');
             
             // Show booking form
-            const dateObj = new Date(selectedDate);
+            const dateObj = parseLocalDate(selectedDate);
             const formattedDate = dateObj.toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
