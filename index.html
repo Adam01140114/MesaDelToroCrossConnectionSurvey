@@ -292,6 +292,13 @@
             border-bottom: 2px solid #f0f0f0;
         }
 
+        .date-weekday {
+            font-size: 0.9rem;
+            color: #4facfe;
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
         .date-day {
             font-size: 1.5rem;
             font-weight: 600;
@@ -774,7 +781,8 @@
                             day: 'numeric' 
                         }),
                         day: date.getDate(),
-                        month: date.toLocaleDateString('en-US', { month: 'short' })
+                        month: date.toLocaleDateString('en-US', { month: 'short' }),
+                        weekday: date.toLocaleDateString('en-US', { weekday: 'short' })
                     });
                 }
             });
@@ -835,6 +843,7 @@
 
                 dateCard.innerHTML = `
                     <div class="date-header">
+                        <div class="date-weekday">${dateInfo.weekday}</div>
                         <div class="date-day">${dateInfo.day}</div>
                         <div class="date-month">${dateInfo.month}</div>
                     </div>
